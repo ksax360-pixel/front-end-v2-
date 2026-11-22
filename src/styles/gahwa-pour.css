@@ -1,0 +1,602 @@
+﻿/* Gahwa pour animation — from hrm-sindhabad */
+
+.gahwa-pour {
+  position: relative;
+  flex-shrink: 0;
+  --gahwa-cycle: 20s;
+}
+
+.gahwa-pour__svg {
+  display: block;
+  overflow: visible;
+}
+
+.gahwa-line {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gahwa-pour.is-drawing .gahwa-line path,
+.gahwa-pour.is-drawing .gahwa-line ellipse {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: gahwa-draw 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.gahwa-pour.is-drawing .gahwa-pour__glow {
+  opacity: 0;
+  animation: gahwa-fade-in 0.9s ease 0.35s forwards;
+}
+
+@keyframes gahwa-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes gahwa-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.gahwa-dallah {
+  transform-box: fill-box;
+  transform-origin: 78% 78%;
+  animation: gahwa-dallah-ritual var(--gahwa-cycle) cubic-bezier(0.45, 0.05, 0.25, 1) infinite;
+}
+
+.gahwa-lid {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gahwa-lid-wobble var(--gahwa-cycle) ease-in-out infinite;
+}
+
+.gahwa-stream {
+  stroke-dasharray: 64;
+  stroke-dashoffset: 64;
+  opacity: 0;
+}
+
+.gahwa-stream--a {
+  animation: gahwa-stream-a var(--gahwa-cycle) linear infinite;
+}
+
+.gahwa-stream--b {
+  animation: gahwa-stream-b var(--gahwa-cycle) linear infinite;
+}
+
+.gahwa-fill__liquid {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: translateY(110%);
+}
+
+.gahwa-fill--1 .gahwa-fill__liquid {
+  animation: gahwa-fill-1 var(--gahwa-cycle) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.gahwa-fill--2 .gahwa-fill__liquid {
+  animation: gahwa-fill-2 var(--gahwa-cycle) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.gahwa-fill__wave {
+  transform-box: fill-box;
+  opacity: 0;
+}
+
+.gahwa-fill--1 .gahwa-fill__wave {
+  animation: gahwa-wave-1 var(--gahwa-cycle) ease-in-out infinite;
+}
+
+.gahwa-fill--2 .gahwa-fill__wave {
+  animation: gahwa-wave-2 var(--gahwa-cycle) ease-in-out infinite;
+}
+
+.gahwa-drop {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: gahwa-drop var(--gahwa-cycle) linear infinite;
+}
+
+.gahwa-ripple {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.gahwa-ripple--1 {
+  animation: gahwa-ripple-1 var(--gahwa-cycle) linear infinite;
+}
+
+.gahwa-ripple--2 {
+  animation: gahwa-ripple-2 var(--gahwa-cycle) linear infinite;
+}
+
+.gahwa-steam {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.gahwa-steam--spout-a,
+.gahwa-steam--spout-b {
+  animation: gahwa-steam-spout 3.6s ease-in-out infinite;
+}
+
+.gahwa-steam--spout-b {
+  animation-delay: 0.7s;
+}
+
+.gahwa-steam--1 {
+  animation: gahwa-steam-cup-1 var(--gahwa-cycle) ease-out infinite;
+}
+
+.gahwa-steam--2 {
+  animation: gahwa-steam-cup-1 var(--gahwa-cycle) ease-out infinite;
+  animation-delay: 0.35s;
+}
+
+.gahwa-steam--3 {
+  animation: gahwa-steam-cup-2 var(--gahwa-cycle) ease-out infinite;
+}
+
+/* Cycle A 0–50%, Cycle B 50–100% of 20s */
+@keyframes gahwa-dallah-ritual {
+  /* Cycle A idle */
+  0%,
+  5% {
+    transform: translateY(0) rotate(0deg);
+  }
+  2.5% {
+    transform: translateY(-1.5px) rotate(0deg);
+  }
+  /* Lift & tilt → cup 1 (spout left) */
+  6%,
+  12.5% {
+    transform: translateY(-6px) rotate(-32deg);
+  }
+  15% {
+    transform: translateY(-6px) rotate(-30deg);
+  }
+  /* Return */
+  18% {
+    transform: translateY(-2px) rotate(-8deg);
+  }
+  22% {
+    transform: translateY(1px) rotate(0deg);
+  }
+  25%,
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  /* Cycle B idle breath */
+  52.5% {
+    transform: translateY(-1.5px) rotate(0deg);
+  }
+  55%,
+  56% {
+    transform: translateY(0) rotate(0deg);
+  }
+  /* Lift & tilt → cup 2 (slightly less angle / different target) */
+  56%,
+  62.5% {
+    transform: translateY(-6px) rotate(-26deg);
+  }
+  65% {
+    transform: translateY(-6px) rotate(-24deg);
+  }
+  68% {
+    transform: translateY(-2px) rotate(-6deg);
+  }
+  72% {
+    transform: translateY(1px) rotate(0deg);
+  }
+  75%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes gahwa-lid-wobble {
+  0%,
+  5%,
+  18%,
+  55%,
+  68%,
+  100% {
+    transform: rotate(0deg);
+  }
+  8%,
+  12%,
+  58%,
+  62% {
+    transform: rotate(1.2deg);
+  }
+  10%,
+  60% {
+    transform: rotate(-0.8deg);
+  }
+}
+
+@keyframes gahwa-stream-a {
+  0%,
+  10.5%,
+  31%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 64;
+    transform: translateX(0);
+  }
+  11% {
+    opacity: 0.85;
+    stroke-dashoffset: 64;
+  }
+  14% {
+    opacity: 0.9;
+    stroke-dashoffset: 0;
+  }
+  14%,
+  27% {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+    transform: translateX(0);
+  }
+  18% {
+    transform: translateX(0.6px);
+  }
+  22% {
+    transform: translateX(-0.5px);
+  }
+  27.5% {
+    opacity: 0.75;
+    stroke-dashoffset: 0;
+  }
+  /* retract from spout (offset grows from start) */
+  30.5% {
+    opacity: 0.4;
+    stroke-dashoffset: -64;
+  }
+  31.5% {
+    opacity: 0;
+    stroke-dashoffset: -64;
+  }
+}
+
+@keyframes gahwa-stream-b {
+  0%,
+  60.5%,
+  81%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 64;
+    transform: translateX(0);
+  }
+  61% {
+    opacity: 0.85;
+    stroke-dashoffset: 64;
+  }
+  64% {
+    opacity: 0.9;
+    stroke-dashoffset: 0;
+  }
+  64%,
+  77% {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+  }
+  68% {
+    transform: translateX(0.55px);
+  }
+  72% {
+    transform: translateX(-0.45px);
+  }
+  77.5% {
+    opacity: 0.75;
+    stroke-dashoffset: 0;
+  }
+  80.5% {
+    opacity: 0.4;
+    stroke-dashoffset: -64;
+  }
+  81.5% {
+    opacity: 0;
+    stroke-dashoffset: -64;
+  }
+}
+
+/* Fill to ~1/3: liquid rect starts low; translateY(0) shows ~third via clip */
+@keyframes gahwa-fill-1 {
+  0%,
+  12%,
+  48%,
+  100% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+  13% {
+    opacity: 0.9;
+    transform: translateY(110%);
+  }
+  27% {
+    transform: translateY(42%);
+    opacity: 0.95;
+  }
+  31%,
+  42% {
+    transform: translateY(42%);
+    opacity: 0.95;
+  }
+  47% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+}
+
+@keyframes gahwa-fill-2 {
+  0%,
+  50%,
+  62%,
+  98%,
+  100% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+  63% {
+    opacity: 0.9;
+    transform: translateY(110%);
+  }
+  77% {
+    transform: translateY(42%);
+    opacity: 0.95;
+  }
+  81%,
+  92% {
+    transform: translateY(42%);
+    opacity: 0.95;
+  }
+  97% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+}
+
+@keyframes gahwa-wave-1 {
+  0%,
+  13%,
+  47%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  15%,
+  42% {
+    opacity: 0.55;
+  }
+  20% {
+    transform: translateY(-1px);
+  }
+  28% {
+    transform: translateY(1px);
+  }
+  36% {
+    transform: translateY(-0.6px);
+  }
+}
+
+@keyframes gahwa-wave-2 {
+  0%,
+  63%,
+  97%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  65%,
+  92% {
+    opacity: 0.55;
+  }
+  70% {
+    transform: translateY(-1px);
+  }
+  78% {
+    transform: translateY(1px);
+  }
+  86% {
+    transform: translateY(-0.6px);
+  }
+}
+
+@keyframes gahwa-drop {
+  0%,
+  29%,
+  32%,
+  79%,
+  82%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  29.5% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  31.2% {
+    opacity: 0.8;
+    transform: translate(-10px, 34px) scale(0.7);
+  }
+  31.8% {
+    opacity: 0;
+    transform: translate(-12px, 40px) scale(0.4);
+  }
+  79.5% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  81.2% {
+    opacity: 0.8;
+    transform: translate(8px, 36px) scale(0.7);
+  }
+  81.8% {
+    opacity: 0;
+    transform: translate(10px, 42px) scale(0.4);
+  }
+}
+
+@keyframes gahwa-ripple-1 {
+  0%,
+  30.5%,
+  34%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  31.2% {
+    opacity: 0.7;
+    transform: scale(0.6);
+  }
+  33% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes gahwa-ripple-2 {
+  0%,
+  80.5%,
+  84%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  81.2% {
+    opacity: 0.7;
+    transform: scale(0.6);
+  }
+  83% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes gahwa-steam-spout {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(4px) scaleY(0.7);
+  }
+  30% {
+    opacity: 0.55;
+  }
+  60% {
+    opacity: 0.2;
+    transform: translateY(-10px) scaleY(1.1);
+  }
+  85% {
+    opacity: 0;
+    transform: translateY(-16px) scaleY(1.2);
+  }
+}
+
+@keyframes gahwa-steam-cup-1 {
+  0%,
+  32%,
+  48%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 6px) scale(0.85);
+  }
+  34% {
+    opacity: 0.55;
+  }
+  40% {
+    opacity: 0.35;
+    transform: translate(3px, -14px) scale(1.05);
+  }
+  46% {
+    opacity: 0;
+    transform: translate(5px, -22px) scale(1.15);
+  }
+}
+
+@keyframes gahwa-steam-cup-2 {
+  0%,
+  82%,
+  98%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 6px) scale(0.85);
+  }
+  84% {
+    opacity: 0.55;
+  }
+  90% {
+    opacity: 0.35;
+    transform: translate(3px, -14px) scale(1.05);
+  }
+  96% {
+    opacity: 0;
+    transform: translate(5px, -22px) scale(1.15);
+  }
+}
+
+.gahwa-pour.is-paused .gahwa-dallah,
+.gahwa-pour.is-paused .gahwa-lid,
+.gahwa-pour.is-paused .gahwa-stream,
+.gahwa-pour.is-paused .gahwa-fill__liquid,
+.gahwa-pour.is-paused .gahwa-fill__wave,
+.gahwa-pour.is-paused .gahwa-drop,
+.gahwa-pour.is-paused .gahwa-ripple,
+.gahwa-pour.is-paused .gahwa-steam {
+  animation-play-state: paused !important;
+}
+
+.gahwa-pour.is-reduced .gahwa-dallah,
+.gahwa-pour.is-reduced .gahwa-lid,
+.gahwa-pour.is-reduced .gahwa-stream,
+.gahwa-pour.is-reduced .gahwa-drop,
+.gahwa-pour.is-reduced .gahwa-ripple,
+.gahwa-pour.is-reduced .gahwa-steam--spout-a,
+.gahwa-pour.is-reduced .gahwa-steam--spout-b,
+.gahwa-pour.is-reduced .gahwa-steam--2,
+.gahwa-pour.is-reduced .gahwa-steam--3,
+.gahwa-pour.is-reduced .gahwa-fill--2 .gahwa-fill__liquid,
+.gahwa-pour.is-reduced .gahwa-fill--2 .gahwa-fill__wave {
+  animation: none !important;
+}
+
+.gahwa-pour.is-reduced .gahwa-dallah {
+  transform: none;
+}
+
+.gahwa-pour.is-reduced .gahwa-stream {
+  opacity: 0;
+}
+
+.gahwa-pour.is-reduced .gahwa-fill--1 .gahwa-fill__liquid {
+  animation: none !important;
+  transform: translateY(42%);
+  opacity: 0.95;
+}
+
+.gahwa-pour.is-reduced .gahwa-fill--1 .gahwa-fill__wave {
+  animation: none !important;
+  opacity: 0.45;
+}
+
+.gahwa-pour.is-reduced .gahwa-steam--1 {
+  animation: none !important;
+  opacity: 0.4;
+  transform: translate(2px, -8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gahwa-card__pattern,
+  .gahwa-card__glow,
+  .gahwa-card__cta-arrow {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

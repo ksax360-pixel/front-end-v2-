@@ -1157,6 +1157,12 @@
 
 /* ---------- Request quotes form ---------- */
 .rfq2 { padding-block: 1.5rem 4rem; }
+.rfq2__buyer-note {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--hukum-muted);
+}
 .rfq2__wrap { max-width: 1120px; margin-inline: auto; padding-inline: var(--hukum-gutter); }
 .rfq2__head h1 {
   margin: 0; font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 600; letter-spacing: -.02em; color: var(--hukum-ink);

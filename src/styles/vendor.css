@@ -549,3 +549,26 @@
 .va-act { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
 .vpr-act.va-ok { border-color: var(--hukum-green); background: var(--hukum-green); color: #fff; }
 .vpr-act.va-ok:hover:not(:disabled) { background: var(--hukum-green-hover); color: #fff; }
+
+/* Buyer workspace: folder panel for New request must NOT use inbox 2-col grid */
+.buyer-ws .vrq-body.bnr-panel,
+.bh .vrq-body.bnr-panel {
+  display: block !important;
+  grid-template-columns: none !important;
+  width: 100%;
+}
+.buyer-ws .vrq-folder > .vrq-tabs,
+.bh .vrq-folder > .vrq-tabs {
+  border-bottom: 0 !important;
+}
+.buyer-ws .vrq-folder > .vrq-tabs a.is-on,
+.bh .vrq-folder > .vrq-tabs a.is-on,
+.buyer-ws .vrq-folder > .vrq-tabs a[aria-current="page"],
+.bh .vrq-folder > .vrq-tabs a[aria-current="page"] {
+  margin-bottom: -1px;
+  border-bottom: 0 !important;
+  border-radius: 1.05rem 1.05rem 0 0;
+  background: #fff;
+  color: #0b3e26;
+  box-shadow: inset 0 3px 0 0 #0b3e26;
+}

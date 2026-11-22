@@ -110,8 +110,9 @@ export function segmentNav(items: DashNavItem[]): DashNavItem[][] {
   const groups: DashNavItem[][] = [];
   let current: DashNavItem[] = [];
   const breaks = new Set([
-    "/buyer/messages",
+    "/buyer/saved",
     "/buyer/boq",
+    "/buyer/settings",
     "/vendor/products",
     "/vendor/company",
     "/vendor/subscription",

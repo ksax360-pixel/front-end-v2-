@@ -162,7 +162,8 @@ export async function POST(req: Request) {
       if (!session) return fail("Unauthorized", 401);
       const user = await User.findById(session.id).select("-passwordHash -resetToken -resetTokenExpires").lean();
       const vendorSlug = await resolveVendorSlug(session.vendorId);
-      return ok({ session, user, vendorSlug });
+      const buyerProfile = await resolveBuyerProfile(session.id, session.roles);
+      return ok({ session, user, vendorSlug, buyerProfile });
     }
 
     if (action === "update_profile") {
@@ -206,6 +207,14 @@ async function resolveVendorSlug(vendorId?: string) {
   return typeof slug === "string" ? slug : slug.en;
 }
 
+async function resolveBuyerProfile(userId: string, roles?: string[]) {
+  if (!roles?.includes("buyer")) return undefined;
+  const buyer = await Buyer.findOne({ userId }).select("company city type").lean();
+  if (!buyer) return undefined;
+  const b = buyer as { company?: string; city?: string; type?: string };
+  return { company: b.company || "", city: b.city || "", type: b.type || "" };
+}
+
 export async function GET() {
   try {
     const session = await getSession();
@@ -213,7 +222,8 @@ export async function GET() {
     await connectDB();
     const user = await User.findById(session.id).select("-passwordHash -resetToken -resetTokenExpires").lean();
     const vendorSlug = await resolveVendorSlug(session.vendorId);
-    return ok({ session, user, vendorSlug });
+    const buyerProfile = await resolveBuyerProfile(session.id, session.roles);
+    return ok({ session, user, vendorSlug, buyerProfile });
   } catch (e) {
     return fail((e as Error).message, 500);
   }

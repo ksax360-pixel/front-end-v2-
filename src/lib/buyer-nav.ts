@@ -4,7 +4,6 @@ export const BUYER_NAV = [
   { href: "/buyer/dashboard", label: "Home" },
   { href: "/buyer/rfqs", label: "Requests" },
   { href: "/buyer/quotations", label: "Quotes" },
-  { href: "/buyer/messages", label: "Messages" },
   { href: "/buyer/saved", label: "Saved" },
   { href: "/buyer/suppliers", label: "Suppliers" },
   { href: "/buyer/boq", label: "BOQ upload" },

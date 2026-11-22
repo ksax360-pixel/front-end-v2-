@@ -9,8 +9,10 @@ export default async function BuyerSettingsPage({ params }: { params: Promise<{ 
   const locale = (isLocale(raw) ? raw : "en") as Locale;
   setRequestLocale(locale);
   return (
-    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]}>
-      <AccountSettings locale={locale} role="buyer" />
+    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]} allowDark={false}>
+      <div className="bh sd-page">
+        <AccountSettings locale={locale} role="buyer" />
+      </div>
     </DashboardShell>
   );
 }

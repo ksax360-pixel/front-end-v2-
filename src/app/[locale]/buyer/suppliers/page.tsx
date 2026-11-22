@@ -4,6 +4,8 @@ import { setRequestLocale } from "next-intl/server";
 import { BadgeCheck, Search } from "lucide-react";
 import { isLocale, type Locale } from "@/i18n/config";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { BuyerHubHeader } from "@/components/buyer/BuyerHubHeader";
+import { BuyerFolderPanel } from "@/components/buyer/BuyerFolderPanel";
 import { getSession } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { BUYER_NAV } from "@/lib/buyer-nav";
@@ -58,52 +60,67 @@ export default async function BuyerSuppliersPage({ params }: { params: Promise<{
   const date = (iso: string): string => new Date(iso).toLocaleDateString(isAr ? "ar-SA-u-nu-latn" : "en-GB", { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]}>
-      <div className="bh sv" dir={isAr ? "rtl" : "ltr"}>
-        <header className="bh-head">
-          <div>
-            <h1>{L("Suppliers", "الموردون")}</h1>
-            <p>{L("Everyone who has quoted you. Go back to the ones that worked.", "كل من أرسل لك عرض. ارجع للي ناسبوك.")}</p>
-          </div>
-          <Link href={`/${locale}/vendors`} className="bh-btn"><Search size={15} aria-hidden /> {L("Find suppliers", "ابحث عن موردين")}</Link>
-        </header>
-        {rows.length ? (
-          <div className="ci-table-wrap bsp-wrap">
-            <table className="van-table bsp-table">
-              <thead>
-                <tr>
-                  <th scope="col">{L("Supplier", "المورد")}</th>
-                  <th scope="col">{L("Quotes", "العروض")}</th>
-                  <th scope="col">{L("Accepted", "المقبولة")}</th>
-                  <th scope="col">{L("Last quote", "آخر عرض")}</th>
-                  <th scope="col"><span className="sr-only">{L("Actions", "إجراءات")}</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id}>
-                    <td>
-                      <Link href={`/${locale}/vendors/${r.slug}`} className="bsp-name">
-                        <b>{r.name} {r.verified ? <BadgeCheck size={15} aria-label={L("Verified", "موثّق")} className="sv-tick" /> : null}</b>
-                        {r.city ? <small>{cityName(r.city, locale)}</small> : null}
-                      </Link>
-                    </td>
-                    <td>{r.quotes}</td>
-                    <td>{r.accepted}</td>
-                    <td>{date(r.last)}</td>
-                    <td><Link href={`/${locale}/rfq?vendorId=${r.id}`} className="vpr-act">{L("Request again", "اطلب مرة ثانية")}</Link></td>
+    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]} allowDark={false}>
+      <div className="bh sd-page ib-hub sv" dir={isAr ? "rtl" : "ltr"}>
+        <BuyerHubHeader
+          locale={locale}
+          title={L("Suppliers", "الموردون")}
+          lead={L(
+            "Everyone who has quoted you. Go back to the ones that worked.",
+            "كل من أرسل لك عرض. ارجع للي ناسبوك.",
+          )}
+          actions={
+            <Link href={`/${locale}/vendors`} className="bh-btn">
+              <Search size={15} aria-hidden /> {L("Find suppliers", "ابحث عن موردين")}
+            </Link>
+          }
+          stats={[
+            { label: L("Suppliers", "الموردون"), value: rows.length, active: true },
+            {
+              label: L("Accepted", "المقبولة"),
+              value: rows.reduce((n, r) => n + r.accepted, 0),
+            },
+          ]}
+        />
+        <BuyerFolderPanel tabLabel={L("Suppliers", "الموردون")}>
+          {rows.length ? (
+            <div className="ci-table-wrap bsp-wrap bsp-wrap--flush">
+              <table className="van-table bsp-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{L("Supplier", "المورد")}</th>
+                    <th scope="col">{L("Quotes", "العروض")}</th>
+                    <th scope="col">{L("Accepted", "المقبولة")}</th>
+                    <th scope="col">{L("Last quote", "آخر عرض")}</th>
+                    <th scope="col"><span className="sr-only">{L("Actions", "إجراءات")}</span></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="vpr-empty">
-            <h2>{L("No quotes yet", "ما وصلتك عروض بعد")}</h2>
-            <p>{L("Suppliers appear here once they quote one of your requests.", "الموردون يظهرون هنا أول ما يسعّرون أحد طلباتك.")}</p>
-            <div className="bh-empty__ways"><Link href={`/${locale}/rfq`}>{L("Ask suppliers for a price", "اطلب سعر من الموردين")}</Link></div>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.id}>
+                      <td>
+                        <Link href={`/${locale}/vendors/${r.slug}`} className="bsp-name">
+                          <b>{r.name} {r.verified ? <BadgeCheck size={15} aria-label={L("Verified", "موثّق")} className="sv-tick" /> : null}</b>
+                          {r.city ? <small>{cityName(r.city, locale)}</small> : null}
+                        </Link>
+                      </td>
+                      <td>{r.quotes}</td>
+                      <td>{r.accepted}</td>
+                      <td>{date(r.last)}</td>
+                      <td><Link href={`/${locale}/buyer/rfqs/new?vendorId=${r.id}`} className="vpr-act">{L("Request again", "اطلب مرة ثانية")}</Link></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="vpr-empty vpr-empty--flush">
+              <h2>{L("No quotes yet", "ما وصلتك عروض بعد")}</h2>
+              <p>{L("Suppliers appear here once they quote one of your requests.", "الموردون يظهرون هنا أول ما يسعّرون أحد طلباتك.")}</p>
+              <div className="bh-empty__ways"><Link href={`/${locale}/buyer/rfqs/new`}>{L("Ask suppliers for a price", "اطلب سعر من الموردين")}</Link></div>
+            </div>
+          )}
+        </BuyerFolderPanel>
       </div>
     </DashboardShell>
   );

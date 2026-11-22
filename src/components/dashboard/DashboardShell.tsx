@@ -2,8 +2,23 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { Bell, ChevronDown, Compass, LogOut, Menu, Moon, Sun, Ticket, User, X } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  Bell,
+  ChevronDown,
+  Compass,
+  ExternalLink,
+  LogOut,
+  Menu,
+  Moon,
+  Plus,
+  Settings,
+  Sun,
+  Ticket,
+  User,
+  UserRound,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { enrichNav, segmentNav } from "@/data/dashboard-nav";
@@ -125,6 +140,28 @@ function DashboardChrome({
   const { startTour } = useOnboardingTour();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointer = (e: MouseEvent | PointerEvent) => {
+      const el = accountRef.current;
+      if (!el) return;
+      if (e.target instanceof Node && !el.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
   const items = enrichNav(nav).map((item) => ({
     ...item,
     label: dashNavLabel(locale, item.href, item.label),
@@ -223,6 +260,241 @@ function DashboardChrome({
     </>
   );
 
+  /* Buyer workspace — seller shell look & feel (Seller-hukum-FULL-build) */
+  if (role === "buyer") {
+    const isAr = locale === "ar";
+    const altLocale = isAr ? "en" : "ar";
+    const altPath = pathname.replace(/^\/(en|ar)/, `/${altLocale}`);
+    const groupLabels = [
+      dashT(locale, "Sourcing"),
+      dashT(locale, "Collection"),
+      dashT(locale, "Tools"),
+      dashT(locale, "Account"),
+    ];
+    const midGroups = segments.slice(0, -1);
+    const footGroup = segments.length > 1 ? segments[segments.length - 1] : [];
+    const mainGroups = segments.length > 1 ? midGroups : segments;
+
+    const renderItem = (item: (typeof items)[number]) => {
+      const href = `/${locale}${item.href}`;
+      const active =
+        pathname === href ||
+        (item.href !== "/buyer/dashboard" && pathname.startsWith(`${href}/`)) ||
+        (item.href === "/buyer/rfqs" && pathname.includes("/buyer/rfqs"));
+      const Icon = item.icon;
+      return (
+        <Link
+          key={item.href}
+          href={href}
+          onClick={() => setMobileOpen(false)}
+          aria-current={active ? "page" : undefined}
+          className="ws-item"
+          data-onboarding={item.onboarding}
+        >
+          <Icon className="ws-item__glyph" size={18} strokeWidth={1.35} aria-hidden />
+          <span className="ws-item__label">{item.label}</span>
+        </Link>
+      );
+    };
+
+    return (
+      <div className="buyer-ws ws-root relative flex min-h-dvh overflow-x-hidden" dir={isAr ? "rtl" : "ltr"}>
+        {mobileOpen ? (
+          <button
+            type="button"
+            className="fixed inset-0 z-40 bg-[#111C17]/35 lg:hidden"
+            aria-label={dashT(locale, "Close menu")}
+            onClick={() => setMobileOpen(false)}
+          />
+        ) : null}
+
+        <aside
+          className={cn(
+            "ws-sidebar fixed inset-y-0 start-0 z-50 flex h-dvh w-[min(16.5rem,90vw)] flex-col transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:w-[16.5rem] lg:translate-x-0",
+            mobileOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full lg:ltr:translate-x-0 lg:rtl:translate-x-0",
+          )}
+          aria-label={isAr ? "القائمة الرئيسية" : "Main menu"}
+          data-onboarding="navigation"
+        >
+          <div className="ws-sidebar__head">
+            <Link href={`/${locale}/buyer/dashboard`} className="ws-brand" onClick={() => setMobileOpen(false)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/hukum-calligraphy.png" alt="Hukum" width={96} height={48} />
+              <span className="ws-brand__rule" aria-hidden />
+            </Link>
+            <button
+              type="button"
+              className="btn-icon ws-sidebar__close lg:hidden"
+              onClick={() => setMobileOpen(false)}
+              aria-label={dashT(locale, "Close")}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <nav className="ws-nav flex flex-1 flex-col overflow-y-auto">
+            {mainGroups.map((seg, i) => (
+              <div key={`g-${i}`} className="ws-group">
+                {groupLabels[i] ? <p className="ws-group__label">{groupLabels[i]}</p> : null}
+                {seg.map(renderItem)}
+              </div>
+            ))}
+            {footGroup.length ? (
+              <div className="ws-group ws-group--foot">
+                {groupLabels[mainGroups.length] ? (
+                  <p className="ws-group__label">{groupLabels[mainGroups.length]}</p>
+                ) : null}
+                {footGroup.map(renderItem)}
+              </div>
+            ) : null}
+          </nav>
+        </aside>
+
+        <div className="ws-shell-main flex min-h-dvh min-w-0 flex-1 flex-col">
+          <header className="ws-topbar" data-onboarding="header">
+            <h1 className="sr-only">{pageTitle}</h1>
+            <div className="ws-topbar__inner">
+              <div className="ws-topbar__lead">
+                <button
+                  type="button"
+                  className="btn-icon ws-menu-btn lg:hidden"
+                  onClick={() => setMobileOpen(true)}
+                  aria-label={dashT(locale, "Open menu")}
+                >
+                  <Menu size={26} strokeWidth={2} />
+                </button>
+              </div>
+
+              <div className="ws-topbar__actions">
+                <Link href={`/${locale}/buyer/rfqs/new`} className="ws-visit">
+                  <Plus size={14} strokeWidth={1.9} aria-hidden />
+                  <span>{dashT(locale, "New request")}</span>
+                </Link>
+                <Link href={`/${locale}`} className="ws-visit ws-visit--ghost max-lg:hidden">
+                  <ExternalLink size={14} strokeWidth={1.9} aria-hidden />
+                  <span>{dashT(locale, "Marketplace")}</span>
+                </Link>
+
+                <span className="ws-topbar__rule" aria-hidden />
+
+                <div className="ws-lang-switch" role="group" aria-label={isAr ? "اللغة" : "Language"}>
+                  <Link
+                    href={isAr ? altPath : pathname}
+                    hrefLang="en"
+                    className={cn("ws-lang-opt", !isAr && "is-active")}
+                    aria-current={!isAr ? "true" : undefined}
+                  >
+                    EN
+                  </Link>
+                  <Link
+                    href={!isAr ? altPath : pathname}
+                    hrefLang="ar"
+                    className={cn("ws-lang-opt", isAr && "is-active")}
+                    aria-current={isAr ? "true" : undefined}
+                    lang="ar"
+                    aria-label="العربية"
+                    title="العربية"
+                  >
+                    ع
+                  </Link>
+                </div>
+
+                <div className="ws-lang-dd">
+                  <Link
+                    href={altPath}
+                    className="ws-lang-dd__btn"
+                    aria-label={isAr ? "اللغة" : "Language"}
+                  >
+                    <span>{isAr ? "ع" : "EN"}</span>
+                    <ChevronDown size={12} aria-hidden />
+                  </Link>
+                </div>
+
+                <Link
+                  href={`/${locale}/buyer/rfqs?tab=messages`}
+                  className="ws-icon-btn"
+                  aria-label={dashT(locale, "Alerts")}
+                  title={dashT(locale, "Alerts")}
+                  data-onboarding="alerts"
+                >
+                  <Bell size={16} />
+                </Link>
+
+                <div className="relative" ref={accountRef}>
+                  <button
+                    type="button"
+                    className="ws-account-btn"
+                    aria-expanded={menuOpen}
+                    aria-haspopup="menu"
+                    aria-label={isAr ? "الحساب" : "Account menu"}
+                    onClick={() => setMenuOpen((v) => !v)}
+                  >
+                    <UserRound size={15} strokeWidth={1.8} aria-hidden />
+                    <ChevronDown size={13} aria-hidden />
+                  </button>
+                  {menuOpen ? (
+                    <div className="ws-account-menu" role="menu">
+                      <div className="px-3 py-2">
+                        <p className="m-0 truncate text-sm font-semibold text-[var(--text)]">
+                          {user?.name || dashT(locale, "Account")}
+                        </p>
+                        <p className="m-0 truncate text-[11px] text-[var(--muted)]">{user?.email || ""}</p>
+                      </div>
+                      <Link
+                        href={`/${locale}/buyer/settings`}
+                        role="menuitem"
+                        className="ws-account-menu__item"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Settings size={14} aria-hidden />
+                        {dashT(locale, "Settings")}
+                      </Link>
+                      <Link
+                        href={ticketHref}
+                        role="menuitem"
+                        className="ws-account-menu__item"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Ticket size={14} aria-hidden />
+                        {dashT(locale, "Raise a ticket")}
+                      </Link>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="ws-account-menu__item"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          requestTourReplay();
+                          startTour({ force: true });
+                        }}
+                      >
+                        <Compass size={14} aria-hidden />
+                        {dashT(locale, "Product tour")}
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="ws-account-menu__item is-danger"
+                        onClick={() => void logout()}
+                      >
+                        <LogOut size={14} aria-hidden />
+                        {dashT(locale, "Sign out")}
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main className="ws-main min-w-0 flex-1 overflow-x-hidden px-4 pb-8 pt-5 md:px-6 lg:px-8">
+            {children}
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="kt-admin-root relative flex min-h-screen">
       <aside className="dash-sidebar fixed top-0 start-0 z-40 hidden h-screen w-56 shrink-0 flex-col overflow-y-auto px-3 py-5 lg:flex">
@@ -266,11 +538,6 @@ function DashboardChrome({
                 <Bell size={14} />
                 <span className="hidden sm:inline">{dashT(locale, "Alerts")}</span>
               </button>
-              {role === "buyer" ? (
-                <Link href={`/${locale}/rfq`} className="dash-chip dash-chip--primary hidden sm:inline-flex">
-                  {dashT(locale, "New request")}
-                </Link>
-              ) : null}
               {role === "vendor" ? (
                 <Link href={websiteHref} target="_blank" className="dash-chip hidden lg:inline-flex" data-onboarding="website">
                   {dashT(locale, "View your website")}
@@ -280,7 +547,7 @@ function DashboardChrome({
                   {dashT(locale, "Marketplace")}
                 </Link>
               )}
-              <div className="relative">
+              <div className="relative" ref={accountRef}>
                 <button type="button" className="dash-chip" onClick={() => setMenuOpen((v) => !v)}>
                   <span className={cn("grid h-5 w-5 place-items-center rounded-full", dark ? "bg-white/10" : "bg-[#17634B]/10 text-[var(--hukum-green)]")}>
                     <User size={12} />

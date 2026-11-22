@@ -7,6 +7,7 @@ import { ask, toast } from "@/components/ui/Feedback";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { BuyerHubHeader } from "@/components/buyer/BuyerHubHeader";
 import { BUYER_NAV } from "@/lib/buyer-nav";
 import { QuoteCompareMatrix } from "@/components/quotations/QuoteCompareMatrix";
 import {
@@ -253,7 +254,7 @@ function QuotationsInner() {
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.message || "Could not start chat");
-      window.location.href = `/${locale}/buyer/messages`;
+      window.location.href = `/${locale}/buyer/rfqs?tab=messages`;
     } catch (e) {
       setError((e as Error).message);
       setActionBusy(false);
@@ -266,21 +267,33 @@ function QuotationsInner() {
   const open = (s?: string): boolean => ["submitted", "revised", "clarifying", "shortlisted"].includes(s || "submitted");
 
   return (
-    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]}>
-      <div className={`bh vrq bq${selectedId ? " has-detail" : ""}`} dir={isAr ? "rtl" : "ltr"}>
-        <header className="bh-head">
-          <div>
-            <h1>
-              {rfqFilter && shown[0]
-                ? L(`Quotes for “${rfqName || rfqRef(shown[0], locale)}”`, `عروض «${rfqName || rfqRef(shown[0], locale)}»`)
-                : L("Quotes", "العروض")}
-            </h1>
-            <p>{rfqFilter ? L("Compare them side by side. Accept one to get the supplier's contact and agree the order with them.", "قارنها جنب بعض. اقبل واحد لتحصل على بيانات تواصل المورد وتتفق معه على الطلب.") : L("Every quote on your requests.", "كل العروض على طلباتك.")}</p>
-          </div>
-          <Link href={rfqFilter ? `/${locale}/buyer/quotations` : `/${locale}/buyer/rfqs`} className="bh-btn">
-            {rfqFilter ? L("All quotes", "كل العروض") : L("Your requests", "طلباتك")}
-          </Link>
-        </header>
+    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]} allowDark={false}>
+      <div className={`bh sd-page ib-hub vrq bq${selectedId ? " has-detail" : ""}`} dir={isAr ? "rtl" : "ltr"}>
+        <BuyerHubHeader
+          locale={locale as "en" | "ar"}
+          title={
+            rfqFilter && shown[0]
+              ? L(`Quotes for “${rfqName || rfqRef(shown[0], locale)}”`, `عروض «${rfqName || rfqRef(shown[0], locale)}»`)
+              : L("Quotes", "العروض")
+          }
+          lead={
+            rfqFilter
+              ? L(
+                  "Compare them side by side. Accept one to get the supplier's contact and agree the order with them.",
+                  "قارنها جنب بعض. اقبل واحد لتحصل على بيانات تواصل المورد وتتفق معه على الطلب.",
+                )
+              : L("Every quote on your requests.", "كل العروض على طلباتك.")
+          }
+          actions={
+            <Link href={rfqFilter ? `/${locale}/buyer/quotations` : `/${locale}/buyer/rfqs`} className="bh-btn">
+              {rfqFilter ? L("All quotes", "كل العروض") : L("Your requests", "طلباتك")}
+            </Link>
+          }
+          stats={[
+            { label: L("Open", "مفتوحة"), value: shown.filter((q) => open(q.status)).length },
+            { label: L("All quotes", "كل العروض"), value: shown.length, active: true },
+          ]}
+        />
 
         {error ? <p className="sfe-status is-rejected">{error}</p> : null}
 
@@ -294,6 +307,12 @@ function QuotationsInner() {
           onToggle={(id) => setCompareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 5 ? prev : [...prev, id]))}
         />
 
+        <div className="vrq-folder">
+          <div className="vrq-tabs" role="presentation">
+            <span className="is-on" aria-current="page">
+              {L("Quotes", "العروض")}
+            </span>
+          </div>
         <div className="vrq-body">
           <section className="vrq-list" aria-label={L("Quotes", "العروض")}>
             {loading ? (
@@ -301,7 +320,7 @@ function QuotationsInner() {
             ) : shown.length === 0 ? (
               <p className="pdp2-empty vrq-empty">
                 {L("No quotes yet. They show here as suppliers reply to your requests.", "ما فيه عروض بعد. تظهر هنا أول ما يرد الموردون على طلباتك.")}{" "}
-                <Link href={`/${locale}/rfq`}>{L("Ask for a price", "اطلب سعر")}</Link>
+                <Link href={`/${locale}/buyer/rfqs/new`}>{L("Ask for a price", "اطلب سعر")}</Link>
               </p>
             ) : (
               <ul>
@@ -408,6 +427,7 @@ function QuotationsInner() {
               <p className="vrq-pick">{L("Couldn't load this quote.", "تعذّر تحميل العرض.")}</p>
             )}
           </section>
+        </div>
         </div>
       </div>
     </DashboardShell>

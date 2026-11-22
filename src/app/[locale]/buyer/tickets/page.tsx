@@ -9,8 +9,10 @@ export default function BuyerTicketsPage() {
   const params = useParams();
   const locale = String(params.locale || "en");
   return (
-    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]}>
-      <TicketDesk role="buyer" />
+    <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]} allowDark={false}>
+      <div className="bh sd-page">
+        <TicketDesk role="buyer" />
+      </div>
     </DashboardShell>
   );
 }

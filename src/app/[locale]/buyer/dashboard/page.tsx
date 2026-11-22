@@ -7,7 +7,6 @@ import { loadBuyerRequests, type BuyerRequestRow } from "@/lib/buyer-requests";
 import { getSession } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { User } from "@/modules/users/user.model";
-import { emptyBuyerDashboard, loadBuyerDashboardData } from "@/lib/buyer-dashboard";
 import { BUYER_NAV } from "@/lib/buyer-nav";
 
 export default async function BuyerDashboardPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -29,25 +28,15 @@ export default async function BuyerDashboardPage({ params }: { params: Promise<{
   }
 
   let name = "Buyer";
-  let mobile = "";
   try {
     await connectDB();
-    const user = await User.findById(session.id).select("name email mobile").lean();
+    const user = await User.findById(session.id).select("name email").lean();
     name =
       (user as { name?: string } | null)?.name ||
       session.email.split("@")[0] ||
       "Buyer";
-    mobile = (user as { mobile?: string } | null)?.mobile || "";
   } catch {
     name = session.email.split("@")[0] || "Buyer";
-  }
-
-  let data = emptyBuyerDashboard(locale);
-  try {
-    await connectDB();
-    data = await loadBuyerDashboardData(session.id, session.email, locale, mobile);
-  } catch {
-    data = emptyBuyerDashboard(locale);
   }
 
   let rows: BuyerRequestRow[] = [];
@@ -59,13 +48,7 @@ export default async function BuyerDashboardPage({ params }: { params: Promise<{
 
   return (
     <DashboardShell locale={locale} title="Buyer" nav={[...BUYER_NAV]} allowDark={false}>
-      <BuyerRequestsHome
-        locale={locale}
-        name={name}
-        rows={rows}
-        savedCount={data.metrics.savedProducts}
-        supplierCount={data.ranking.length}
-      />
+      <BuyerRequestsHome locale={locale} name={name} rows={rows} />
     </DashboardShell>
   );
 }
